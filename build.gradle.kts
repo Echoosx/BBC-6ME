@@ -3,13 +3,20 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
 
-    id("net.mamoe.mirai-console") version "2.10.0"
+    id("net.mamoe.mirai-console") version "2.10.1"
 }
 
-group = "org.example"
-version = "0.1.0"
+group = "org.echoosx"
+version = "1.0.0"
 
 repositories {
     maven("https://maven.aliyun.com/repository/public") // 阿里云国内代理仓库
     mavenCentral()
+}
+
+dependencies {
+    implementation("org.quartz-scheduler:quartz:2.3.2") {
+        exclude(group = "org.slf4j")
+    }
+    implementation("org.jsoup:jsoup:1.14.3")
 }
