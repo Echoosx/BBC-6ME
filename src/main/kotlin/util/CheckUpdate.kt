@@ -66,7 +66,7 @@ internal class CheckUpdate: Job {
         val proxy = java.net.Proxy(java.net.Proxy.Type.HTTP, InetSocketAddress(host, port))
         val document: Document = Jsoup.connect("https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")
             .proxy(proxy)
-            .timeout(timeout)
+            .timeout(timeout * 1000)
             .get()
 
         val latest = document.select("div.widget-bbcle-coursecontentlist-featured")
@@ -82,24 +82,37 @@ internal class CheckUpdate: Job {
 
 internal fun downloadThumbnail(url:String): InputStream{
     val proxy = java.net.Proxy(java.net.Proxy.Type.HTTP, InetSocketAddress(host, port))
-    val response = Jsoup.connect(url).proxy(proxy).ignoreContentType(true).timeout(timeout).execute()
+    val response = Jsoup.connect(url).proxy(proxy).ignoreContentType(true).timeout(timeout * 1000).execute()
     return response.bodyStream()
 }
 
 internal fun Bot.sendSubscribe(article:Article) = BBCEnglishPlugin.launch {
     val resource = downloadThumbnail(article.img).toExternalResource()
-    groups.filter { bbcPerm.testPermission(it.permitteeId) }.forEach{ group->
+
+    groups.filter { bbcPerm.testPermission(it.permitteeId) }.forEach { group ->
         val message = buildMessageChain {
             appendLine("BBC 6 Minutes English")
             appendLine("")
             appendLine("Topic: ${article.title}")
             appendLine(article.desc)
-            append(resource.use { it.uploadAsImage(group) })
+            append(resource.uploadAsImage(group))
             append(article.link)
         }
         group.sendMessage(message)
     }
+    friends.filter { bbcPerm.testPermission(it.permitteeId) }.forEach{ friend->
+        val message = buildMessageChain {
+            appendLine("BBC 6 Minutes English")
+            appendLine("")
+            appendLine("Topic: ${article.title}")
+            appendLine(article.desc)
+            append(resource.uploadAsImage(friend))
+            append(article.link)
+        }
+        friend.sendMessage(message)
+    }
     withContext(Dispatchers.IO) {
         resource.close()
     }
+
 }

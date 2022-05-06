@@ -18,7 +18,7 @@ object BBCEnglishPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "org.echoosx.mirai.plugin.BBC-6ME",
         name = "BBC-6ME",
-        version = "1.0.0"
+        version = "1.0.1"
     ) {
         author("Echoosx")
     }
